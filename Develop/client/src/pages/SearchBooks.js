@@ -12,6 +12,28 @@ import Auth from '../utils/auth';
 import { saveBook, searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
+const [saveBook] = queries(SAVE_BOOK, {
+ update(cache, { data: { saveBook } }) {
+    try {
+      const { me } = cache.readQuery({
+        query: GET_USER,
+      });
+      cache.writeQuery({
+        query: GET_USER,
+        data: {
+          me: {
+            ...me,
+            savedBooks: [
+              ...me.savedBooks,
+              saveBook.savedBooks[saveBook.savedBooks.length - 1],
+            ],
+          },
+        },
+      });
+    } catch (error) {}
+  },
+});
+
 const SearchBooks = () => {
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
